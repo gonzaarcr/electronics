@@ -9,7 +9,7 @@ class MyScene(Scene):
 
 	def construct(self):
 		signal = Signal()
-		import pdb; pdb.set_trace()
 		tmp1 = signal.get_edge_propogation_animations()
-		tmp1 += signal.get_edge_propogation_animations(1)
+		import pdb; pdb.set_trace()
 		self.play(*tmp1)
+
