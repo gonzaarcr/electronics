@@ -9,7 +9,7 @@ from mobject.geometry import *
 from mobject.svg.svg_mobject import *
 from scene.scene import Scene
 
-from electronics.components import Signal
+from electronics.components import *
 
 
 class MyScene(Scene):
@@ -38,24 +38,17 @@ class MyScene(Scene):
 		# self.play(*tmp1)
 		# self.wait(5)
 
-		circuit = SVGMobject(file_name="drawing2")
 		import pdb; pdb.set_trace()
-		circuit.set_stroke(width=1,color="White")
-		circuit.set_fill(opacity=0)
-		brain_outline = circuit.copy()
-		brain_outline.set_stroke(BLUE_B, 3)
+		circuit = SvgBuilder("drawing2.svg")
+		circuit.get_combinational().scale_to_fit_height(2)
+		self.add(circuit.get_combinational())
 
-		self.add(circuit)
+		from_anim = circuit.get_registers().copy()
+		from_anim.set_stroke(width=1,color=BLUE_E)
+		to_anim = circuit.get_registers().copy()
+		to_anim.set_stroke(width=1,color=RED_E)
 
-		for x in range(2):
-			self.play(
-				ShowPassingFlash(
-					brain_outline, 
-					time_width = 2,
-					run_time = 2
-				)
-			)
-
+		self.play(circuit.get_combinational().set_stroke, width=1, color=RED_E)
+		
 		self.wait()
-
-
+		
