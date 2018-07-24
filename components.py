@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from xml.dom import minidom
 from copy import copy
-from os import path
+import os
 from tempfile import NamedTemporaryFile
 from xml.etree import ElementTree
 
@@ -44,32 +45,35 @@ class SvgBuilder():
 			"polyline",
 			"path",
 		]
-		import pdb;pdb.set_trace()
 		with open(path) as f:
-			xml = ElementTree.parse(f)
-			tree = xml.getroot()
-			regsEt = deepcopy(xml)
-			combEt = deepcopy(xml)
-			regs = regsEt.getroot()
-			comb = combEt.getroot()
+			xml = minidom.parse(f)
+			# tree = xml.getroot()
+			regs = xml.cloneNode(deep=True)
+			comb = xml.cloneNode(deep=True)
+			regs_root = regs.documentElement
+			comb_root = comb.documentElement
+			xml.unlink()
 
-		to_remove = []
-		for el in comb.iterfind('{http://www.w3.org/2000/svg}rect'):
-			to_remove.append(el)
+		to_remove = comb_root.getElementsByTagName('rect')
+		for el in to_remove:
+			el.parentNode.removeChild(el).unlink()
 
-		map(lambda x: comb.remove(x), to_remove)
-
-		to_remove = []
 		for tag in combinationals:
-			for el in regs.iterfind('{http://www.w3.org/2000/svg}' + tag):
-				to_remove.append(el)
-		
-		map(lambda x: regs.remove(x), to_remove)
+			to_remove = regs_root.getElementsByTagName(tag)
+			for el in to_remove:
+				el.parentNode.removeChild(el).unlink()
 
 		g = NamedTemporaryFile()
 		h = NamedTemporaryFile()
-		combEt.write(g.name,default_namespace=None)
-		regsEt.write(h.name,default_namespace=None)
+		g.write(regs_root.toxml())
+		g.flush()
+		os.fsync(g)
+		h.write(comb_root.toxml())
+		h.flush()
+		os.fsync(h)
+
+		regs_root.unlink()
+		comb_root.unlink()
 
 		self.registers = SVGMobject(file_name=g.name)
 		self.registers.set_stroke(width=1,color="White")

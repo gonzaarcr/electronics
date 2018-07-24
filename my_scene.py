@@ -38,7 +38,6 @@ class MyScene(Scene):
 		# self.play(*tmp1)
 		# self.wait(5)
 
-		import pdb; pdb.set_trace()
 		circuit = SvgBuilder("drawing2.svg")
 		circuit.get_combinational().scale_to_fit_height(2)
 		self.add(circuit.get_combinational())
