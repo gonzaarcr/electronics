@@ -25,6 +25,7 @@ class SvgBuilder():
 	def __init__(self, path):
 		self.registers = None
 		self.combinational = None
+		self.all = None
 		self._cycle_time = 10
 		self._register_transform_time = 1
 
@@ -46,6 +47,7 @@ class SvgBuilder():
 			"path",
 		]
 		with open(path) as f:
+			self.all = SVGMobject(file_name=f.name)
 			xml = minidom.parse(f)
 			# tree = xml.getroot()
 			regs = xml.cloneNode(deep=True)
@@ -75,9 +77,13 @@ class SvgBuilder():
 		regs_root.unlink()
 		comb_root.unlink()
 
+		self.all.set_stroke(width=1,color="White")
+		self.all.set_fill(opacity=0)
+		
 		self.registers = SVGMobject(file_name=g.name)
 		self.registers.set_stroke(width=1,color="White")
 		self.registers.set_fill(opacity=0)
+		
 		self.combinational = SVGMobject(file_name=h.name)
 		self.combinational.set_stroke(width=1,color="White")
 		self.combinational.set_fill(opacity=0)
@@ -93,14 +99,20 @@ class SvgBuilder():
 		from_anim.set_stroke(width=1,color=BLUE_E)
 		to_anim = self.registers.copy()
 		to_anim.set_stroke(width=1,color=RED_E)
-		return ReplacementTransform(from_anim, to_anim)
+		return Transform(from_anim, to_anim)
 
 	def get_registers(self):
-		return self.registers
+		ret = VMobject(*filter(lambda x: isinstance(x, Rectangle), self.all.submobjects))
+		return ret
+		# return self.registers
 
 	def get_combinational(self):
-		return self.combinational
+		ret = VMobject(*filter(lambda x: isinstance(x, VMobjectFromSVGPathstring), self.all.submobjects))
+		return ret
+		# return self.combinational
 
+	def get_all(self):
+		return self.all
 
 class Signal(Line):
 	"""

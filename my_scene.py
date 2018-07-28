@@ -37,17 +37,28 @@ class MyScene(Scene):
 		# self.play(*args)
 		# self.play(*tmp1)
 		# self.wait(5)
-
+		
 		circuit = SvgBuilder("drawing2.svg")
-		circuit.get_combinational().scale_to_fit_height(2)
-		self.add(circuit.get_combinational())
+		comb_background = circuit.get_combinational()
+		regs_background = circuit.get_registers()
+		
+		# self.add(comb_background)
+		# self.add(regs_background)
+		self.add(circuit.get_all())
 
-		from_anim = circuit.get_registers().copy()
-		from_anim.set_stroke(width=1,color=BLUE_E)
-		to_anim = circuit.get_registers().copy()
-		to_anim.set_stroke(width=1,color=RED_E)
-
-		self.play(circuit.get_combinational().set_stroke, width=1, color=RED_E)
+		from_anim = comb_background.copy()
+		map(lambda x: x.set_stroke(width=4,color=RED_A), from_anim.submobjects)
+		to_anim = regs_background.copy()
+		map(lambda x: x.set_stroke(width=4,color=RED_E), to_anim.submobjects)
+		
+		self.wait()
+		self.play(from_anim.set_stroke, width=4, color=BLUE_E, run_time=2, submobject_mode="all_at_once")
+		self.wait()
+		self.play(FadeToColor(to_anim, BLUE_E, run_time=3))
+		self.play(FadeToColor(to_anim, RED_E, run_time=3))
+		self.play(FadeToColor(to_anim, YELLOW_E, run_time=3))
+		self.wait()
+		# self.play(ShowCreation(from_anim, run_time=2, submobject_mode="all_at_once"))
 		
 		self.wait()
 		
