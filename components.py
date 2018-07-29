@@ -38,60 +38,21 @@ class SvgBuilder():
 		self._init_from_file(path)
 
 	def _init_from_file(self, path):
-		combinationals = [
-			"circle",
-			"ellipse",
-			"line",
-			"polygon",
-			"polyline",
-			"path",
-		]
 		with open(path) as f:
 			self.all = SVGMobject(file_name=f.name)
-			xml = minidom.parse(f)
-			# tree = xml.getroot()
-			regs = xml.cloneNode(deep=True)
-			comb = xml.cloneNode(deep=True)
-			regs_root = regs.documentElement
-			comb_root = comb.documentElement
-			xml.unlink()
-
-		to_remove = comb_root.getElementsByTagName('rect')
-		for el in to_remove:
-			el.parentNode.removeChild(el).unlink()
-
-		for tag in combinationals:
-			to_remove = regs_root.getElementsByTagName(tag)
-			for el in to_remove:
-				el.parentNode.removeChild(el).unlink()
-
-		g = NamedTemporaryFile()
-		h = NamedTemporaryFile()
-		g.write(regs_root.toxml())
-		g.flush()
-		os.fsync(g)
-		h.write(comb_root.toxml())
-		h.flush()
-		os.fsync(h)
-
-		regs_root.unlink()
-		comb_root.unlink()
 
 		self.all.set_stroke(width=1,color="White")
 		self.all.set_fill(opacity=0)
 		
-		self.registers = SVGMobject(file_name=g.name)
-		self.registers.set_stroke(width=1,color="White")
+		self.registers = \
+			VMobject(*filter(lambda x: isinstance(x, Rectangle), self.all.submobjects))
+		self.registers.set_stroke(width=1,color=PINK)
 		self.registers.set_fill(opacity=0)
 		
-		self.combinational = SVGMobject(file_name=h.name)
-		self.combinational.set_stroke(width=1,color="White")
+		self.combinational = \
+			VMobject(*filter(lambda x: isinstance(x, VMobjectFromSVGPathstring), self.all.submobjects))
+		self.combinational.set_stroke(width=1,color=WHITE)
 		self.combinational.set_fill(opacity=0)
-
-		if not g.closed:
-			g.close()
-		if not h.closed:
-			h.close()
 
 	def get_animation(self):
 		retval = []
@@ -102,14 +63,10 @@ class SvgBuilder():
 		return Transform(from_anim, to_anim)
 
 	def get_registers(self):
-		ret = VMobject(*filter(lambda x: isinstance(x, Rectangle), self.all.submobjects))
-		return ret
-		# return self.registers
+		return self.registers
 
 	def get_combinational(self):
-		ret = VMobject(*filter(lambda x: isinstance(x, VMobjectFromSVGPathstring), self.all.submobjects))
-		return ret
-		# return self.combinational
+		return self.combinational
 
 	def get_all(self):
 		return self.all
