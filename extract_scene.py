@@ -1,4 +1,5 @@
 # !/usr/bin/env python2
+# -*- coding: utf-8 -*-
 
 from __future__ import absolute_import
 from __future__ import print_function
@@ -76,7 +77,7 @@ def get_configuration():
                 args.output_name)
             expected_ext = '.png' if args.show_last_frame else '.mp4'
             if output_name_ext not in ['', expected_ext]:
-                print("WARNING: The output will be to (doubly-dotted) %s%s" %
+                print("WARNIpythonNG: The output will be to (doubly-dotted) %s%s" %
                       output_name_root % expected_ext)
                 output_name = args.output_name
             else:
@@ -239,7 +240,7 @@ def get_module_posix(file_name):
         # Relativo a la linea de comandos
         full_path = os.path.join(os.getcwd(), file_name.replace(".py", "")).split(os.sep)
 
-        for i in len(full_path):
+        for i in range(len(full_path)):
             module = full_path[i:]
             try:
                 loaded = imp.load_module(module, *imp.find_module(module))
